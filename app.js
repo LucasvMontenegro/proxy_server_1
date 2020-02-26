@@ -17,16 +17,10 @@ const restream = function(proxyReq, req, res, options) {
     proxyReq.write(bodyData);
   }
 };
-// const resp = (proxyRes, res ) => {
-// if (res.body){
-
-// }
-// }
 
 const apiProxy = createProxyMiddleware("/proxy", {
   target: "http://localhost:6666/proxy2",
   onProxyReq: restream,
-  //onProxyRes: resp,
   pathRewrite: {
     "^/proxy": "" // remove path
   }
@@ -41,8 +35,8 @@ app.use(autentication);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
-app.use("/proxy", proxyRoutes);
-app.use(apiProxy); // with restreaming
+app.use("/proxy/", [proxyRoutes, apiProxy]);
+//app.use(apiProxy); // with restreaming
 
 app.use("/user", userRoutes);
 
