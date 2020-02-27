@@ -1,4 +1,4 @@
-const { createProxyMiddleware } = require("http-proxy-middleware");
+// const { createProxyMiddleware } = require("http-proxy-middleware");
 
 // let restreamReq;
 // let restreamRes;
@@ -9,15 +9,17 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 //   onProxyReq: restreamReq,
 //   onProxyRes: restreamRes,
 //   pathRewrite: {
-//     "": "" // remove path
+//     "": ""
 //   }
 // };
 
-function proxy(event) {
-  let proxyPath = event.proxyPath;
-  let options = event.options;
+// const proxy = (event) => {
+//   this.proxyPath = event.proxyPath;
+//   this.options = event.options;
+//   console.log("FUNCAO PROXY")
+// }
+// const apiProxy = createProxyMiddleware(proxyPath, options);
 
-  const apiProxy = createProxyMiddleware(proxyPath, options);
-}
+// module.exports = proxy;
+// module.exports = apiProxy;
 
-module.exports = proxy;
