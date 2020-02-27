@@ -6,9 +6,9 @@ const proxyRoutes = require("./routers/proxy");
 
 const app = express();
 
-const restream = function(proxyReq, req, res, options) {
+const restreamReq = function(proxyReq, req, res, options) {
   if (req.body) {
-    if(req.body.method) proxyReq.method = req.body.method;
+    if (req.body.method) proxyReq.method = req.body.method;
     let bodyData = JSON.stringify(req.body);
     // incase if content-type is application/x-www-form-urlencoded -> we need to change to application/json
     proxyReq.setHeader("Content-Type", "application/json");
@@ -17,10 +17,32 @@ const restream = function(proxyReq, req, res, options) {
     proxyReq.write(bodyData);
   }
 };
+const restreamRes = function(proxyRes, req, res) {
+  var _write = res.write;
+  var output;
+  var body = "";
+  proxyRes.on("data", function(data) {
+    data = data.toString("utf-8");
+    body += data;
+  });
+  res.write = function(data) {
+    try {
+      output = JSON.parse(body);
+      //chama uma funcao 
+      output.message = "ALTERED";
+      _write.call(res, JSON.stringify(output));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+};
+let proxyPath = "/proxy";
+let proxyTarget = "http://localhost:6666/proxy2";
 
-const apiProxy = createProxyMiddleware("/proxy", {
-  target: "http://localhost:6666/proxy2",
-  onProxyReq: restream,
+const apiProxy = createProxyMiddleware(proxyPath, {
+  target: proxyTarget,
+  onProxyReq: restreamReq,
+  onProxyRes: restreamRes,
   pathRewrite: {
     "^/proxy": "" // remove path
   }
@@ -30,12 +52,13 @@ const autentication = function(req, res, next) {
   console.log("autentication middleware");
   next();
 };
+proxyMiddlewares = [proxyRoutes, apiProxy];
 
 app.use(autentication);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
-app.use("/proxy/", [proxyRoutes, apiProxy]);
+app.use("/proxy/", proxyMiddlewares);
 //app.use(apiProxy); // with restreaming
 
 app.use("/user", userRoutes);
