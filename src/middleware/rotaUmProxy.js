@@ -30,16 +30,17 @@ let restreamRes = function(proxyRes, req, res) {
   };
 };
 
-let proxyPath = "/rotaUm";
+//let proxyPath = "/rotaUm";
 let options = {
-  target: "http://localhost:6666/proxy2",
+  target: "http://localhost:6666/proxy2/",
+  ignorePath: true,
   onProxyReq: restreamReq,
   onProxyRes: restreamRes,
-  pathRewrite: {
-    "^/rotaUm": "" // remove path
-  }
+  // pathRewrite: {
+  //   "^/rotaUm": "" // remove path
+  // }
 };
 
-const apiProxy = createProxyMiddleware(proxyPath, options);
+const apiProxy = createProxyMiddleware(options);
 
 module.exports = apiProxy;
