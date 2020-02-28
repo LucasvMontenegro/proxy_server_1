@@ -4,9 +4,6 @@ const apiProxy = require("../middleware/rotaUmProxy");
 
 router
   .route("/")
-  .get((req, res, next) => {
-    next();
-  })
   .post((req, res, next) => {
     next();
   }, apiProxy)
