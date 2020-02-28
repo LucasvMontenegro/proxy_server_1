@@ -1,5 +1,14 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
+let restreamReq = function(proxyReq, req, res, options) {
+  if (req.body) {
+    let bodyData = JSON.stringify(req.body);
+    proxyReq.setHeader("Content-Type", "application/json");
+    proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
+    proxyReq.write(bodyData);
+  }
+};
+
 let restreamRes = function(proxyRes, req, res) {
   var _write = res.write;
   var output;
@@ -11,22 +20,14 @@ let restreamRes = function(proxyRes, req, res) {
   res.write = function(data) {
     try {
       output = JSON.parse(body);
-      output.message = "ALTERED";
+      //console.log("Antes", output)
+      output.message = 'resposta alterada';
+      //console.log("Depois", output)
       _write.call(res, JSON.stringify(output));
     } catch (err) {
       console.log(err);
     }
   };
-};
-
-let restreamReq = function(proxyReq, req, res, options) {
-  if (req.body) {
-    if (req.body.method) proxyReq.method = req.body.method;
-    let bodyData = JSON.stringify(req.body);
-    proxyReq.setHeader("Content-Type", "application/json");
-    proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
-    proxyReq.write(bodyData);
-  }
 };
 
 let proxyPath = "/rotaUm";
@@ -39,9 +40,6 @@ let options = {
   }
 };
 
-const middleware = () => {
-  console.log("AAAAAAAAAA");
-};
 const apiProxy = createProxyMiddleware(proxyPath, options);
 
 module.exports = apiProxy;
